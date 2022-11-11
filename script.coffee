@@ -47,7 +47,6 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
 
     # look for the person in the data
     this_person = [first_name, last_name, divisions.indexOf(selected_div)+1].join("|").toUpperCase()
-    console.log(this_person)
 
     index_in_data = person_index.find((d) -> d.name == this_person)
 
@@ -58,17 +57,28 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         if all_indices.length > 1 # pick a random one
             index_in_data = all_indices[ Math.floor( Math.random() * all_indices.length ) ]
 
-    console.log(index_in_data)
+        d3.select("div#chart")
+          .text("Yay we found #{first_name} #{last_name} in #{selected_div}")
 
-#    result = (v for v in x when v.a==2 and v.b==4)
+        this_record = salaries[index_in_data.index]
+        title = this_record.title
+        salary = this_record.AnnualSalary
+        target_jobcodes = jobcodes[title]
 
-    d3.select("div#chart")
-      .text("hello #{first_name} #{last_name} (#{selected_div}) - #{scope}")
+        console.log([title, salary])
+        console.log(target_jobcodes)
 
+        salaries_subset = salaries.filter((d) -> target_jobcodes.indexOf(d.JobCode) >= 0)
 
+        if scope=="within" # subset by division
+            salaries_subset = salaries_subset.filter((d) -> d.Division == this_record.Division)
 
-# look for matching record
-# find the job codes for that person's title
-# look for other people with one of those job codes (overall, or within that division)
+        comp_salaries = (d.AnnualSalary for d in salaries_subset)
+        console.log(comp_salaries)
+
+    else
+        d3.select("div#chart")
+          .text("#{first_name} #{last_name} not found in #{selected_div}")
+
 # dotplot of those points
 # add boxplot over the dotplot

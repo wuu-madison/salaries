@@ -48,7 +48,7 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes, person_index) {
-  var all_indices, first_name, index_in_data, last_name, scope, scope_across, selected_div, this_person;
+  var all_indices, comp_salaries, d, first_name, index_in_data, last_name, salaries_subset, salary, scope, scope_across, selected_div, target_jobcodes, this_person, this_record, title;
   // grab form data
   last_name = d3.select("input#last_name").property("value");
   first_name = d3.select("input#first_name").property("value");
@@ -59,7 +59,6 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
   scope = scope_across ? "across" : "within";
   // look for the person in the data
   this_person = [first_name, last_name, divisions.indexOf(selected_div) + 1].join("|").toUpperCase();
-  console.log(this_person);
   index_in_data = person_index.find(function (d) {
     return d.name === this_person;
   });
@@ -71,16 +70,37 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     if (all_indices.length > 1) {
       // pick a random one
       index_in_data = all_indices[Math.floor(Math.random() * all_indices.length)];
-    } // individual was found
+    }
+    d3.select("div#chart").text(`Yay we found ${first_name} ${last_name} in ${selected_div}`);
+    this_record = salaries[index_in_data.index];
+    title = this_record.title;
+    salary = this_record.AnnualSalary;
+    target_jobcodes = jobcodes[title];
+    console.log([title, salary]);
+    console.log(target_jobcodes);
+    salaries_subset = salaries.filter(function (d) {
+      return target_jobcodes.indexOf(d.JobCode) >= 0;
+    });
+    if (scope === "within") {
+      // subset by division
+      salaries_subset = salaries_subset.filter(function (d) {
+        return d.Division === this_record.Division;
+      });
+    }
+    comp_salaries = function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_subset.length; j < len; j++) {
+        d = salaries_subset[j];
+        results.push(d.AnnualSalary);
+      }
+      return results;
+    }();
+    return console.log(comp_salaries);
+  } else {
+    return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }
-
-  console.log(index_in_data);
-  //    result = (v for v in x when v.a==2 and v.b==4)
-  return d3.select("div#chart").text(`hello ${first_name} ${last_name} (${selected_div}) - ${scope}`);
 };
 
-// look for matching record
-// find the job codes for that person's title
-// look for other people with one of those job codes (overall, or within that division)
 // dotplot of those points
 // add boxplot over the dotplot
