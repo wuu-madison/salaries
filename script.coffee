@@ -37,8 +37,8 @@ d3.json("salaries.json").then (salaries) ->
 
 plot_data = (salaries, divisions, jobcodes, person_index) ->
     # grab form data
-    last_name = d3.select("input#last_name").property("value")
-    first_name = d3.select("input#first_name").property("value")
+    last_name = d3.select("input#last_name").property("value").toUpperCase()
+    first_name = d3.select("input#first_name").property("value").toUpperCase()
     # division
     selected_div = d3.select("select#division option:checked").text()
     # scope
@@ -46,7 +46,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
     scope = if scope_across then "across" else "within"
 
     # look for the person in the data
-    this_person = [first_name, last_name, divisions.indexOf(selected_div)+1].join("|").toUpperCase()
+    this_person = [first_name, last_name, divisions.indexOf(selected_div)+1].join("|")
 
     index_in_data = person_index.find((d) -> d.name == this_person)
 
@@ -65,9 +65,6 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         salary = this_record.AnnualSalary
         target_jobcodes = jobcodes[title]
 
-        console.log([title, salary])
-        console.log(target_jobcodes)
-
         salaries_subset = salaries.filter((d) -> target_jobcodes.indexOf(d.JobCode) >= 0)
 
         if scope=="within" # subset by division
@@ -76,7 +73,11 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         comp_salaries = (d.AnnualSalary for d in salaries_subset)
         labels = (d.FirstName + " " + d.LastName for d in salaries_subset)
 
-        console.log(comp_salaries)
+        # different color for the identified individual
+        group = (2 for d in salaries_subset)
+        this_index = (i for i of salaries_subset when salaries_subset[i].FirstName==first_name and salaries_subset[i].LastName==last_name)
+        if this_index >= 0
+            group[this_index] = 1
 
         mychart = d3panels.dotchart({
             xlab:"",
@@ -86,8 +87,12 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
             width:800,
             horizontal:true})
 
-        data_to_plot = {x:(" " for d in comp_salaries), y:comp_salaries, indID:labels}
+        data_to_plot = {x:(" " for d in comp_salaries), y:comp_salaries, indID:labels, group:group}
         mychart(d3.select("div#chart"), data_to_plot)
+
+        mychart.points()
+            .on "mouseover", (d) -> d3.select(this).attr("r", 6)
+            .on "mouseout", (d) -> d3.select(this).attr("r", 3)
 
     else
         d3.select("div#chart")

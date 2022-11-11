@@ -48,17 +48,17 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes, person_index) {
-  var all_indices, comp_salaries, d, data_to_plot, first_name, index_in_data, labels, last_name, mychart, salaries_subset, salary, scope, scope_across, selected_div, target_jobcodes, this_person, this_record, title;
+  var all_indices, comp_salaries, d, data_to_plot, first_name, group, i, index_in_data, labels, last_name, mychart, salaries_subset, salary, scope, scope_across, selected_div, target_jobcodes, this_index, this_person, this_record, title;
   // grab form data
-  last_name = d3.select("input#last_name").property("value");
-  first_name = d3.select("input#first_name").property("value");
+  last_name = d3.select("input#last_name").property("value").toUpperCase();
+  first_name = d3.select("input#first_name").property("value").toUpperCase();
   // division
   selected_div = d3.select("select#division option:checked").text();
   // scope
   scope_across = d3.select("input#across").property("checked");
   scope = scope_across ? "across" : "within";
   // look for the person in the data
-  this_person = [first_name, last_name, divisions.indexOf(selected_div) + 1].join("|").toUpperCase();
+  this_person = [first_name, last_name, divisions.indexOf(selected_div) + 1].join("|");
   index_in_data = person_index.find(function (d) {
     return d.name === this_person;
   });
@@ -76,8 +76,6 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     title = this_record.title;
     salary = this_record.AnnualSalary;
     target_jobcodes = jobcodes[title];
-    console.log([title, salary]);
-    console.log(target_jobcodes);
     salaries_subset = salaries.filter(function (d) {
       return target_jobcodes.indexOf(d.JobCode) >= 0;
     });
@@ -105,7 +103,29 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
       }
       return results;
     }();
-    console.log(comp_salaries);
+    // different color for the identified individual
+    group = function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_subset.length; j < len; j++) {
+        d = salaries_subset[j];
+        results.push(2);
+      }
+      return results;
+    }();
+    this_index = function () {
+      var results;
+      results = [];
+      for (i in salaries_subset) {
+        if (salaries_subset[i].FirstName === first_name && salaries_subset[i].LastName === last_name) {
+          results.push(i);
+        }
+      }
+      return results;
+    }();
+    if (this_index >= 0) {
+      group[this_index] = 1;
+    }
     mychart = d3panels.dotchart({
       xlab: "",
       ylab: "Salaries",
@@ -125,9 +145,15 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
         return results;
       }(),
       y: comp_salaries,
-      indID: labels
+      indID: labels,
+      group: group
     };
-    return mychart(d3.select("div#chart"), data_to_plot);
+    mychart(d3.select("div#chart"), data_to_plot);
+    return mychart.points().on("mouseover", function (d) {
+      return d3.select(this).attr("r", 6);
+    }).on("mouseout", function (d) {
+      return d3.select(this).attr("r", 3);
+    });
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }
