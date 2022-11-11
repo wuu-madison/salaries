@@ -48,7 +48,7 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes, person_index) {
-  var all_indices, comp_salaries, d, first_name, index_in_data, last_name, salaries_subset, salary, scope, scope_across, selected_div, target_jobcodes, this_person, this_record, title;
+  var all_indices, comp_salaries, d, data_to_plot, first_name, index_in_data, labels, last_name, mychart, salaries_subset, salary, scope, scope_across, selected_div, target_jobcodes, this_person, this_record, title;
   // grab form data
   last_name = d3.select("input#last_name").property("value");
   first_name = d3.select("input#first_name").property("value");
@@ -96,7 +96,38 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
       }
       return results;
     }();
-    return console.log(comp_salaries);
+    labels = function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_subset.length; j < len; j++) {
+        d = salaries_subset[j];
+        results.push(d.FirstName + " " + d.LastName);
+      }
+      return results;
+    }();
+    console.log(comp_salaries);
+    mychart = d3panels.dotchart({
+      xlab: "",
+      ylab: "Salaries",
+      title: "",
+      height: 300,
+      width: 800,
+      horizontal: true
+    });
+    data_to_plot = {
+      x: function () {
+        var j, len, results;
+        results = [];
+        for (j = 0, len = comp_salaries.length; j < len; j++) {
+          d = comp_salaries[j];
+          results.push(" ");
+        }
+        return results;
+      }(),
+      y: comp_salaries,
+      indID: labels
+    };
+    return mychart(d3.select("div#chart"), data_to_plot);
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }

@@ -74,7 +74,20 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
             salaries_subset = salaries_subset.filter((d) -> d.Division == this_record.Division)
 
         comp_salaries = (d.AnnualSalary for d in salaries_subset)
+        labels = (d.FirstName + " " + d.LastName for d in salaries_subset)
+
         console.log(comp_salaries)
+
+        mychart = d3panels.dotchart({
+            xlab:"",
+            ylab:"Salaries",
+            title:"",
+            height:300,
+            width:800,
+            horizontal:true})
+
+        data_to_plot = {x:(" " for d in comp_salaries), y:comp_salaries, indID:labels}
+        mychart(d3.select("div#chart"), data_to_plot)
 
     else
         d3.select("div#chart")
