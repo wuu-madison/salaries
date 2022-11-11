@@ -36,6 +36,9 @@ d3.json("salaries.json").then (salaries) ->
               .on("click", () -> plot_data(salaries, divisions, jobcodes, person_index))
 
 plot_data = (salaries, divisions, jobcodes, person_index) ->
+    d3.select("div#chart svg").remove()
+    d3.select("g.d3panels-tooltip").remove()
+
     # grab form data
     last_name = d3.select("input#last_name").property("value").toUpperCase()
     first_name = d3.select("input#first_name").property("value").toUpperCase()
@@ -95,6 +98,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
             .on "mouseout", (d) -> d3.select(this).attr("r", 3)
 
     else
+
         d3.select("div#chart")
           .text("#{first_name} #{last_name} not found in #{selected_div}")
 

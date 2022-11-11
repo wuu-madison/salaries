@@ -49,6 +49,8 @@ d3.json("salaries.json").then(function (salaries) {
 });
 plot_data = function (salaries, divisions, jobcodes, person_index) {
   var all_indices, comp_salaries, d, data_to_plot, first_name, group, i, index_in_data, labels, last_name, mychart, salaries_subset, salary, scope, scope_across, selected_div, target_jobcodes, this_index, this_person, this_record, title;
+  d3.select("div#chart svg").remove();
+  d3.select("g.d3panels-tooltip").remove();
   // grab form data
   last_name = d3.select("input#last_name").property("value").toUpperCase();
   first_name = d3.select("input#first_name").property("value").toUpperCase();
