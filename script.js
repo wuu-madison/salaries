@@ -134,6 +134,15 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
       title: "",
       height: 300,
       width: 800,
+      margin: {
+        left: 120,
+        top: 20,
+        right: 20,
+        bottom: 40,
+        inner: 3
+      },
+      xcategories: [1, 2],
+      xcatlabels: ["", "you"],
       horizontal: true
     });
     data_to_plot = {
@@ -142,7 +151,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
         results = [];
         for (j = 0, len = comp_salaries.length; j < len; j++) {
           d = comp_salaries[j];
-          results.push(" ");
+          results.push(1);
         }
         return results;
       }(),
@@ -150,6 +159,10 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
       indID: labels,
       group: group
     };
+    data_to_plot.x.push(2);
+    data_to_plot.y.push(salary);
+    data_to_plot.indID.push(first_name + " " + last_name);
+    data_to_plot.group.push(1);
     mychart(d3.select("div#chart"), data_to_plot);
     return mychart.points().on("mouseover", function (d) {
       return d3.select(this).attr("r", 6);

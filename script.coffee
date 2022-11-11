@@ -88,9 +88,18 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
             title:"",
             height:300,
             width:800,
+            margin: {left:120, top:20, right:20, bottom:40, inner:3},
+            xcategories: [1, 2],
+            xcatlabels: ["", "you"],
             horizontal:true})
 
-        data_to_plot = {x:(" " for d in comp_salaries), y:comp_salaries, indID:labels, group:group}
+        data_to_plot = {x:(1 for d in comp_salaries), y:comp_salaries, indID:labels, group:group}
+
+        data_to_plot.x.push(2)
+        data_to_plot.y.push(salary)
+        data_to_plot.indID.push(first_name + " " + last_name)
+        data_to_plot.group.push(1)
+
         mychart(d3.select("div#chart"), data_to_plot)
 
         mychart.points()
