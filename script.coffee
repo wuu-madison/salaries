@@ -24,3 +24,20 @@ d3.json("salaries.json").then (salaries) ->
                 if !(jobcodes[title]?)
                     jobcodes[title] = []
                 jobcodes[title].push(x)
+
+
+            # add
+            d3.select("button")
+              .on("click", () -> plot_data())
+
+plot_data = () ->
+    d3.select("div#chart")
+      .text("hello")
+
+
+# grab form info
+# look for matching record
+# find the job codes for that person's title
+# look for other people with one of those job codes (overall, or within that division)
+# dotplot of those points
+# add boxplot over the dotplot
