@@ -1,0 +1,27 @@
+# convert data to JSON files
+library(readxl)
+library(jsonlite)
+
+x <- readxl::read_excel("Updated August 2022 All Faculty and Staff Title and Salary Information.xlsx")
+x <- as.data.frame(x)
+
+# remove $0 cases
+x <- x[x$"Current Annual Contracted Salary">0,]
+
+# reduce columns
+x <- x[,c("First Name", "Last Name", "Division", "Title", "Salary Grade",
+          "Current Annual Contracted Salary", "Job Code")]
+colnames(x) <- c("FirstName", "LastName", "Division", "Title", "SalaryGrade", "AnnualSalary", "JobCode")
+
+# remove duplicates
+z <- apply(x, 1, paste, collapse="|")
+m <- match(z, z)
+x <- x[unique(m),]
+
+# convert to JSON
+y <- jsonlite::toJSON(x)
+cat(y, file="salaries.json")
+
+# save unique Division
+div <- sort(unique(x$Division))
+cat(div, file="divisions.json")
