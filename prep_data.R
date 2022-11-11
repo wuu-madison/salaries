@@ -20,7 +20,7 @@ x <- x[unique(m),]
 
 # save unique Division
 div <- sort(unique(x$Division))
-cat(div, file="divisions.json")
+cat(jsonlite::toJSON(div), file="divisions.json")
 
 # replace division with division number (1 - no. divisions)
 x$Division <- match(x$Division, div)
