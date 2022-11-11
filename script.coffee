@@ -37,15 +37,12 @@ plot_data = (salaries, divisions, jobcodes) ->
     # division
     selected_div = d3.select("select#division option:checked").text()
     # scope
-#    scope = d3.select("input#scope option:checked").text()
+    scope_across = d3.select("input#across").property("checked")
+    scope = if scope_across then "across" else "within"
 
     d3.select("div#chart")
-      .text("hello #{first_name} #{last_name} (#{selected_div})")
+      .text("hello #{first_name} #{last_name} (#{selected_div}) - #{scope}")
 
-
-
-
-# grab form info
 # look for matching record
 # find the job codes for that person's title
 # look for other people with one of those job codes (overall, or within that division)

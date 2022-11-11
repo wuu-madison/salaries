@@ -23,15 +23,15 @@
       <p>
       <input id="first_name" type="text" placeholder="First name" name="first_name">
 
-      <p>School/division
+      <p>School/division:
         <select id="division" name="division">
         </select>
 
       <p>Compare across campus or within school/division?<br/>
+      <input type="radio" name="scope" id="within" value="within">
+      <label for="within">Within school/division</label><br/>
       <input type="radio" name="scope" id="across" value="across">
-      <label for="across">Across campus</label><br/>
-      <input type="radio" name="scope" id="within" value="within" checked="checked">
-      <label for="within">Within school/division</label>
+      <label for="across">Across campus</label>
 
       <p>
       <button id="submit">Submit</button>

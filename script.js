@@ -31,18 +31,18 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes) {
-  var first_name, last_name, selected_div;
+  var first_name, last_name, scope, scope_across, selected_div;
   // grab form data
   last_name = d3.select("input#last_name").property("value");
   first_name = d3.select("input#first_name").property("value");
   // division
   selected_div = d3.select("select#division option:checked").text();
   // scope
-  //    scope = d3.select("input#scope option:checked").text()
-  return d3.select("div#chart").text(`hello ${first_name} ${last_name} (${selected_div})`);
+  scope_across = d3.select("input#across").property("checked");
+  scope = scope_across ? "across" : "within";
+  return d3.select("div#chart").text(`hello ${first_name} ${last_name} (${selected_div}) - ${scope}`);
 };
 
-// grab form info
 // look for matching record
 // find the job codes for that person's title
 // look for other people with one of those job codes (overall, or within that division)
