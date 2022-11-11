@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>UW-Madison salaries</title>
+
+    <script charset="utf-8" type="text/javascript" src="https://d3js.org/d3.v7.min.js"></script>
+
+    <script type="text/javascript" src="https://rawgit.com/kbroman/d3panels/main/d3panels.js"></script>
+    <link rel=stylesheet type="text/css" href="https://rawgit.com/kbroman/d3panels/main/d3panels.css">
+
+    <style>body { font-family: sans-serif; }</style>
+</head>
+
+
+<body>
+  <h3>UW-Madison salaries</h3>
+
+  <div class="form">
+    <form name="input_form">
+      <p>Last name
+      <input id="last_name" type="text" value="Last Name" name="last_name">
+
+      <p>First name
+      <input id="first_name" type="text" value="First Name" name="first_name">
+
+      <p>School/division
+      <input id="division" type="text" value="Division" name="division">
+
+      <p>Compare across campus or within school/division?<br/>
+      <input type="radio" name="scope" id="across" value="across">
+      <label for="across">Across campus</label><br/>
+      <input type="radio" name="scope" id="within" value="within" checked="checked">
+      <label for="within">Within school/division</label>
+
+      <p>
+      <input type="submit" id="submit", value="Submit"/>
+    </form>
+  </div>
+
+
+  <div class="chart">
+    Put chart here
+  </div>
+
+  <div class="text_output">
+    Put text output here
+  </div>
+
+  <hr/>
+
+  <div class="footer">
+    <img alt="UFAS logo" src="UFAS_logo.jpeg" height="200px"/>
+  </div>
+
+</body>
