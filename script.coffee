@@ -28,11 +28,21 @@ d3.json("salaries.json").then (salaries) ->
 
             # add
             d3.select("button")
-              .on("click", () -> plot_data())
+              .on("click", () -> plot_data(salaries, divisions, jobcodes))
 
-plot_data = () ->
+plot_data = (salaries, divisions, jobcodes) ->
+    # grab form data
+    last_name = d3.select("input#last_name").property("value")
+    first_name = d3.select("input#first_name").property("value")
+    # division
+    selected_div = d3.select("select#division option:checked").text()
+    # scope
+#    scope = d3.select("input#scope option:checked").text()
+
     d3.select("div#chart")
-      .text("hello")
+      .text("hello #{first_name} #{last_name} (#{selected_div})")
+
+
 
 
 # grab form info

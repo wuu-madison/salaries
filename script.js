@@ -25,13 +25,21 @@ d3.json("salaries.json").then(function (salaries) {
       }
       // add
       return d3.select("button").on("click", function () {
-        return plot_data();
+        return plot_data(salaries, divisions, jobcodes);
       });
     });
   });
 });
-plot_data = function () {
-  return d3.select("div#chart").text("hello");
+plot_data = function (salaries, divisions, jobcodes) {
+  var first_name, last_name, selected_div;
+  // grab form data
+  last_name = d3.select("input#last_name").property("value");
+  first_name = d3.select("input#first_name").property("value");
+  // division
+  selected_div = d3.select("select#division option:checked").text();
+  // scope
+  //    scope = d3.select("input#scope option:checked").text()
+  return d3.select("div#chart").text(`hello ${first_name} ${last_name} (${selected_div})`);
 };
 
 // grab form info
