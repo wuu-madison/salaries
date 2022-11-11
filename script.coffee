@@ -25,12 +25,17 @@ d3.json("salaries.json").then (salaries) ->
                     jobcodes[title] = []
                 jobcodes[title].push(x)
 
+            # index of people: vector with {name: first|last|div, index: numeric index}
+            person_division = ([v.FirstName, v.LastName, v.Division].join("|") for v in salaries)
+            person_index = []
+            for i of person_division
+                person_index.push({name:person_division[i], index:i})
 
             # add
             d3.select("button")
-              .on("click", () -> plot_data(salaries, divisions, jobcodes))
+              .on("click", () -> plot_data(salaries, divisions, jobcodes, person_index))
 
-plot_data = (salaries, divisions, jobcodes) ->
+plot_data = (salaries, divisions, jobcodes, person_index) ->
     # grab form data
     last_name = d3.select("input#last_name").property("value")
     first_name = d3.select("input#first_name").property("value")
@@ -40,8 +45,27 @@ plot_data = (salaries, divisions, jobcodes) ->
     scope_across = d3.select("input#across").property("checked")
     scope = if scope_across then "across" else "within"
 
+    # look for the person in the data
+    this_person = [first_name, last_name, divisions.indexOf(selected_div)+1].join("|").toUpperCase()
+    console.log(this_person)
+
+    index_in_data = person_index.find((d) -> d.name == this_person)
+
+    if index_in_data?  # individual was found
+        # if multiple records for that person: pick a random one?
+        all_indices = person_index.filter((d) -> d.name == this_person)
+
+        if all_indices.length > 1 # pick a random one
+            index_in_data = all_indices[ Math.floor( Math.random() * all_indices.length ) ]
+
+    console.log(index_in_data)
+
+#    result = (v for v in x when v.a==2 and v.b==4)
+
     d3.select("div#chart")
       .text("hello #{first_name} #{last_name} (#{selected_div}) - #{scope}")
+
+
 
 # look for matching record
 # find the job codes for that person's title
