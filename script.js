@@ -67,6 +67,8 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     return d.name === this_person;
   });
   if (index_in_data != null) {
+    d3.select("div#chart").text(""); // clear text in div
+
     // if multiple records for that person: pick a random one?
     all_indices = person_index.filter(function (d) {
       return d.name === this_person;

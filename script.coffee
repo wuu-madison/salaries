@@ -54,6 +54,9 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
     index_in_data = person_index.find((d) -> d.name == this_person)
 
     if index_in_data?  # individual was found
+        d3.select("div#chart").text("") # clear text in div
+
+
         # if multiple records for that person: pick a random one?
         all_indices = person_index.filter((d) -> d.name == this_person)
 
