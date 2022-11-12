@@ -60,9 +60,6 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         if all_indices.length > 1 # pick a random one
             index_in_data = all_indices[ Math.floor( Math.random() * all_indices.length ) ]
 
-        d3.select("div#chart")
-          .text("Yay we found #{first_name} #{last_name} in #{selected_div}")
-
         this_record = salaries[index_in_data.index]
         title = this_record.title
         salary = this_record.AnnualSalary
@@ -71,7 +68,10 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         salaries_subset = salaries.filter((d) -> target_jobcodes.indexOf(d.JobCode) >= 0)
 
         if scope=="within" # subset by division
+            plot_title = "\"#{title}\" within #{selected_div}"
             salaries_subset = salaries_subset.filter((d) -> d.Division == this_record.Division)
+        else
+            plot_title = "\"#{title}\" across campus"
 
         comp_salaries = (d.AnnualSalary for d in salaries_subset)
         labels = (d.FirstName + " " + d.LastName for d in salaries_subset)
@@ -85,10 +85,10 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         mychart = d3panels.dotchart({
             xlab:"",
             ylab:"Salaries",
-            title:"",
+            title:plot_title,
             height:300,
             width:800,
-            margin: {left:120, top:20, right:120, bottom:40, inner:3},
+            margin: {left:120, top:40, right:120, bottom:40, inner:3},
             xcategories: [1, 2],
             xcatlabels: ["everyone", "you"],
             horizontal:true})

@@ -50,7 +50,7 @@ d3.json("salaries.json").then(function (salaries) {
 });
 
 plot_data = function (salaries, divisions, jobcodes, person_index) {
-  var all_indices, comp_salaries, d, data_to_plot, first_name, g, green, group, i, index_in_data, j, labels, last_name, len, mychart, ref, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, y1, y2, ym;
+  var all_indices, comp_salaries, d, data_to_plot, first_name, g, green, group, i, index_in_data, j, labels, last_name, len, mychart, plot_title, ref, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, y1, y2, ym;
   d3.select("div#chart svg").remove();
   d3.select("g.d3panels-tooltip").remove();
   // grab form data
@@ -75,7 +75,6 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
       // pick a random one
       index_in_data = all_indices[Math.floor(Math.random() * all_indices.length)];
     }
-    d3.select("div#chart").text(`Yay we found ${first_name} ${last_name} in ${selected_div}`);
     this_record = salaries[index_in_data.index];
     title = this_record.title;
     salary = this_record.AnnualSalary;
@@ -85,9 +84,12 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     });
     if (scope === "within") {
       // subset by division
+      plot_title = `\"${title}\" within ${selected_div}`;
       salaries_subset = salaries_subset.filter(function (d) {
         return d.Division === this_record.Division;
       });
+    } else {
+      plot_title = `\"${title}\" across campus`;
     }
     comp_salaries = function () {
       var j, len, results;
@@ -133,12 +135,12 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     mychart = d3panels.dotchart({
       xlab: "",
       ylab: "Salaries",
-      title: "",
+      title: plot_title,
       height: 300,
       width: 800,
       margin: {
         left: 120,
-        top: 20,
+        top: 40,
         right: 120,
         bottom: 40,
         inner: 3
@@ -186,8 +188,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
       g.append("line").attr("x1", mychart.xscale()(summary[i])).attr("x2", mychart.xscale()(summary[i])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
     }
     g.append("line").attr("x1", mychart.xscale()(summary[1])).attr("x2", mychart.xscale()(summary[3])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y2 * 0.25).style("stroke-width", 3).style("stroke", green);
-    g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym * 0.75 + y1 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
-    return mychart.points().selectAll("circle").raise();
+    return g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym * 0.75 + y1 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }
