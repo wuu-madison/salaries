@@ -50,7 +50,7 @@ d3.json("salaries.json").then(function (salaries) {
 });
 
 plot_data = function (salaries, divisions, jobcodes, person_index) {
-  var all_indices, comp_salaries, d, data_to_plot, first_name, g, group, i, index_in_data, j, labels, last_name, len, mychart, ref, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, y1, y2, ym;
+  var all_indices, comp_salaries, d, data_to_plot, first_name, g, green, group, i, index_in_data, j, labels, last_name, len, mychart, ref, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, y1, y2, ym;
   d3.select("div#chart svg").remove();
   d3.select("g.d3panels-tooltip").remove();
   // grab form data
@@ -177,15 +177,17 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     y1 = mychart.yscale()(1);
     y2 = mychart.yscale()(2);
     ym = (y1 + y2) / 2;
-    g.append("line").attr("x1", mychart.xscale()(summary[0])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", "darkslateblue");
-    g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[4])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", "darkslateblue");
+    green = "#2ECC40";
+    g.append("line").attr("x1", mychart.xscale()(summary[0])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
+    g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[4])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
     ref = [1, 2, 3];
     for (j = 0, len = ref.length; j < len; j++) {
       i = ref[j];
-      g.append("line").attr("x1", mychart.xscale()(summary[i])).attr("x2", mychart.xscale()(summary[i])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", "darkslateblue");
+      g.append("line").attr("x1", mychart.xscale()(summary[i])).attr("x2", mychart.xscale()(summary[i])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
     }
-    g.append("line").attr("x1", mychart.xscale()(summary[1])).attr("x2", mychart.xscale()(summary[3])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y2 * 0.25).style("stroke-width", 3).style("stroke", "darkslateblue");
-    return g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym * 0.75 + y1 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", "darkslateblue");
+    g.append("line").attr("x1", mychart.xscale()(summary[1])).attr("x2", mychart.xscale()(summary[3])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y2 * 0.25).style("stroke-width", 3).style("stroke", green);
+    g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym * 0.75 + y1 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
+    return mychart.points().selectAll("circle").raise();
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }

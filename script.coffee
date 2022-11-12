@@ -114,20 +114,23 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         y1 = mychart.yscale()(1)
         y2 = mychart.yscale()(2)
         ym = (y1+y2)/2
+
+        green = "#2ECC40"
+
         g.append("line")
          .attr("x1", mychart.xscale()(summary[0]))
          .attr("x2", mychart.xscale()(summary[1]))
          .attr("y1", ym)
          .attr("y2", ym)
          .style("stroke-width", 3)
-         .style("stroke", "darkslateblue")
+         .style("stroke", green)
         g.append("line")
          .attr("x1", mychart.xscale()(summary[3]))
          .attr("x2", mychart.xscale()(summary[4]))
          .attr("y1", ym)
          .attr("y2", ym)
          .style("stroke-width", 3)
-         .style("stroke", "darkslateblue")
+         .style("stroke", green)
         for i in [1, 2, 3]
             g.append("line")
              .attr("x1", mychart.xscale()(summary[i]))
@@ -135,21 +138,21 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
              .attr("y1", ym*0.75+y2*0.25)
              .attr("y2", ym*0.75+y1*0.25)
              .style("stroke-width", 3)
-             .style("stroke", "darkslateblue")
+             .style("stroke", green)
         g.append("line")
          .attr("x1", mychart.xscale()(summary[1]))
          .attr("x2", mychart.xscale()(summary[3]))
          .attr("y1", ym*0.75+y2*0.25)
          .attr("y2", ym*0.75+y2*0.25)
          .style("stroke-width", 3)
-         .style("stroke", "darkslateblue")
+         .style("stroke", green)
         g.append("line")
          .attr("x1", mychart.xscale()(summary[3]))
          .attr("x2", mychart.xscale()(summary[1]))
          .attr("y1", ym*0.75+y1*0.25)
          .attr("y2", ym*0.75+y1*0.25)
          .style("stroke-width", 3)
-         .style("stroke", "darkslateblue")
+         .style("stroke", green)
 
     else
 
