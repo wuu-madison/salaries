@@ -38,6 +38,7 @@ d3.json("salaries.json").then (salaries) ->
 plot_data = (salaries, divisions, jobcodes, person_index) ->
     d3.select("div#chart svg").remove()
     d3.select("g.d3panels-tooltip").remove()
+    d3.select("div#text_output").html("")
 
     # grab form data
     last_name = d3.select("input#last_name").property("value").toUpperCase()
@@ -111,7 +112,6 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
 
 
         summary = five_number_summary(comp_salaries)
-        console.log(summary)
 
         g = d3.select("div#chart svg").append("g").attr("id", "boxplot")
         y1 = mychart.yscale()(1)
@@ -156,6 +156,16 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
          .attr("y2", ym*0.75+y1*0.25)
          .style("stroke-width", 3)
          .style("stroke", green)
+
+        d3.select("div#text_output")
+          .html("<p>Your title is #{title} in the #{selected_div}. " +
+                "Your annual salary (adjusted for FTE) is $#{salary}. " +
+                "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " +
+                "that have the same job title as you. " +
+                "The green box represents the range from the 25th to 75th percentile; " +
+                "the central green line is the median. " +
+                "You can either compare salaries in the same title across campus or " +
+                "only within your school/division.")
 
     else
 

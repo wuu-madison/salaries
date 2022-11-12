@@ -9,14 +9,14 @@
     <script type="text/javascript" src="https://rawgit.com/kbroman/d3panels/main/d3panels.js"></script>
     <link rel=stylesheet type="text/css" href="https://rawgit.com/kbroman/d3panels/main/d3panels.css">
 
-    <style>body { font-family: sans-serif; }</style>
+    <link rel=stylesheet type="text/css" href="custom.css">
 </head>
 
 
 <body>
   <h3>UW-Madison salaries</h3>
 
-  <div class="form">
+  <div id="form">
       <input id="last_name" type="text"
              name="last_name" placeholder="Last name">
 
@@ -41,12 +41,11 @@
   <div class="chart" id="chart">
   </div>
 
-  <div class="text_output">
+  <div id="text_output">
   </div>
 
   <hr/>
-
-  <div class="footer">
+  <div id="footer">
     <img alt="UFAS logo" src="UFAS_logo.jpeg" height="200px"/>
   </div>
 
