@@ -88,9 +88,9 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
             title:"",
             height:300,
             width:800,
-            margin: {left:120, top:20, right:20, bottom:40, inner:3},
+            margin: {left:120, top:20, right:120, bottom:40, inner:3},
             xcategories: [1, 2],
-            xcatlabels: ["", "you"],
+            xcatlabels: ["everyone", "you"],
             horizontal:true})
 
         data_to_plot = {x:(1 for d in comp_salaries), y:comp_salaries, indID:labels, group:group}
@@ -106,10 +106,84 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
             .on "mouseover", (d) -> d3.select(this).attr("r", 6)
             .on "mouseout", (d) -> d3.select(this).attr("r", 3)
 
+
+        summary = five_number_summary(comp_salaries)
+        console.log(summary)
+
+        g = d3.select("div#chart svg").append("g").attr("id", "boxplot")
+        y1 = mychart.yscale()(1)
+        y2 = mychart.yscale()(2)
+        ym = (y1+y2)/2
+        g.append("line")
+         .attr("x1", mychart.xscale()(summary[0]))
+         .attr("x2", mychart.xscale()(summary[1]))
+         .attr("y1", ym)
+         .attr("y2", ym)
+         .style("stroke-width", 3)
+         .style("stroke", "darkslateblue")
+        g.append("line")
+         .attr("x1", mychart.xscale()(summary[3]))
+         .attr("x2", mychart.xscale()(summary[4]))
+         .attr("y1", ym)
+         .attr("y2", ym)
+         .style("stroke-width", 3)
+         .style("stroke", "darkslateblue")
+        for i in [1, 2, 3]
+            g.append("line")
+             .attr("x1", mychart.xscale()(summary[i]))
+             .attr("x2", mychart.xscale()(summary[i]))
+             .attr("y1", ym*0.75+y2*0.25)
+             .attr("y2", ym*0.75+y1*0.25)
+             .style("stroke-width", 3)
+             .style("stroke", "darkslateblue")
+        g.append("line")
+         .attr("x1", mychart.xscale()(summary[1]))
+         .attr("x2", mychart.xscale()(summary[3]))
+         .attr("y1", ym*0.75+y2*0.25)
+         .attr("y2", ym*0.75+y2*0.25)
+         .style("stroke-width", 3)
+         .style("stroke", "darkslateblue")
+        g.append("line")
+         .attr("x1", mychart.xscale()(summary[3]))
+         .attr("x2", mychart.xscale()(summary[1]))
+         .attr("y1", ym*0.75+y1*0.25)
+         .attr("y2", ym*0.75+y1*0.25)
+         .style("stroke-width", 3)
+         .style("stroke", "darkslateblue")
+
     else
 
         d3.select("div#chart")
           .text("#{first_name} #{last_name} not found in #{selected_div}")
 
-# dotplot of those points
-# add boxplot over the dotplot
+# calculate min, 25 %ile, median, 75 %ile, max
+five_number_summary = (x) ->
+    return null if !x?
+
+    # drop missing values
+    x = (xv for xv in x when xv?)
+
+    n = x.length
+    return null unless n > 0
+    return [x[0], x[0], x[0], x[0], x[0]] unless n > 1
+
+    x.sort((a,b) -> a-b)
+    if n % 2 == 1
+        median = x[(n-1)/2]
+    else
+        median = (x[n/2] + x[(n/2)-1])/2
+
+    min = x[0]
+    max = x[n-1]
+
+    # calculate lower and upper quartile
+    quarter = (n-1)*0.25
+    below = Math.floor(quarter)
+    above = Math.ceil(quarter)
+    weight1 = quarter - below
+    weight2 = 1-weight1
+
+    lower = (x[below]*weight2 + x[below+1]*weight1)
+    upper = (x[n-below-2]*weight1 + x[n-below-1]*weight2)
+
+    [min, lower, median, upper, max]
