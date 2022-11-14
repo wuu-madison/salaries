@@ -40,7 +40,7 @@ d3.json("salaries.json").then(function (salaries) {
           index: i
         });
       }
-      // add
+      // button click -> make plot
       return d3.select("button").on("click", function () {
         return plot_data(salaries, divisions, jobcodes, person_index);
       });

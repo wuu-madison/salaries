@@ -31,7 +31,7 @@ d3.json("salaries.json").then (salaries) ->
             for i of person_division
                 person_index.push({name:person_division[i], index:i})
 
-            # add
+            # button click -> make plot
             d3.select("button")
               .on("click", () -> plot_data(salaries, divisions, jobcodes, person_index))
 
