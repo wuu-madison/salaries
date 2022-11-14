@@ -11,3 +11,15 @@ div#form {
 button {
     background-color: #CCC;
 }
+
+div#text_output {
+    padding: 6px;
+}
+
+@media screen and (min-width: 750px) {
+    div.row {
+        display: flex;
+        flex-direction: row;
+        width: 100%
+    }
+}
