@@ -117,7 +117,7 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
             ylab:"Annual Salary ($)",
             title:title,
             height:600,
-            width:800,
+            width:900,
             ylim:[ymin*0.95,ymax*1.05],
             margin: {left:160, top:40, right:160, bottom:40, inner:3},
             xcategories: [1, 2, 3, 4],
@@ -140,7 +140,7 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
         y2 = mychart.yscale()(2)
 
         make_boxplot(summary, d3.select("div#chart svg"),
-                     mychart.xscale(), (y1+y2)/2, (y2-y1)/2,
+                     mychart.xscale(), y1*0.67+y2*0.33, (y2-y1)/3,
                      3, green)
 
 
@@ -149,11 +149,11 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
         y3 = mychart.yscale()(3)
 
         make_boxplot(summary_div, d3.select("div#chart svg"),
-                     mychart.xscale(), (y2+y3)/2, (y2-y1)/2,
+                     mychart.xscale(), y2*0.67+y3*0.33, (y2-y1)/3,
                      3, green)
 
 
-        yd = (y2-y1)/16
+        yd = (y2-y1)/24
         ypos = mychart.yscale()(4) + yd*3
 
         g_range = d3.select("div#chart svg").append("g").attr("id", "salary_range")
@@ -222,9 +222,9 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
                 "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " +
                 "that have the same job title as you " +
                 "(across campus, in your school/division, and in your department). " +
-                "The green box represents the range from the 25th to 75th percentile; " +
-                "the central green line is the median. " +
-                "The orange line indicates the salary range for your title;" +
+                "<p>The green boxes represent the range from the 25th to 75th percentile with " +
+                "a central line at the median, across campus and within your school/division. " +
+                "<p>The orange line indicates the salary range for your title;" +
                 "arrowheads on the left or right indicate no minimum or maximum salary, respectively.")
 
     else
