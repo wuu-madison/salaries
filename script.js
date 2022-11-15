@@ -55,8 +55,8 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
   d3.selectAll("g.d3panels-tooltip").remove();
   d3.select("div#text_output").html("");
   // grab form data
-  last_name = d3.select("input#last_name").property("value").toUpperCase();
-  first_name = d3.select("input#first_name").property("value").toUpperCase();
+  last_name = d3.select("input#last_name").property("value").toUpperCase().trim();
+  first_name = d3.select("input#first_name").property("value").toUpperCase().trim();
   // division
   selected_div = d3.select("select#division option:checked").text();
   // look for the person in the data
