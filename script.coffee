@@ -134,14 +134,6 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
          .attr("y2", ym)
          .style("stroke-width", 3)
          .style("stroke", green)
-        for i in [1, 2, 3]
-            g.append("line")
-             .attr("x1", mychart.xscale()(summary[i]))
-             .attr("x2", mychart.xscale()(summary[i]))
-             .attr("y1", ym*0.75+y2*0.25)
-             .attr("y2", ym*0.75+y1*0.25)
-             .style("stroke-width", 3)
-             .style("stroke", green)
         g.append("line")
          .attr("x1", mychart.xscale()(summary[1]))
          .attr("x2", mychart.xscale()(summary[3]))
@@ -156,6 +148,33 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
          .attr("y2", ym*0.75+y1*0.25)
          .style("stroke-width", 3)
          .style("stroke", green)
+
+        vert_line_labels = ["min", "25th %ile", "median", "75th %ile", "max"]
+
+        vert_lines = g.append("g").selectAll("empty")
+                      .data(summary)
+                      .enter()
+                      .append("line")
+                      .style("stroke-width", 3)
+                      .style("stroke", green)
+                      .attr("x1", (d) -> mychart.xscale()(d))
+                      .attr("x2", (d) -> mychart.xscale()(d))
+                      .attr("y1", (d,i) ->
+                          if i==0 or i==4
+                              return ym*0.9 + y2*0.1
+                          else
+                              return ym*0.75 + y2*0.25)
+                      .attr("y2", (d,i) ->
+                          if i==0 or i==4
+                              return ym*0.9 + y1*0.1
+                          else
+                              return ym*0.75 + y1*0.25)
+        # add tool tip
+        vert_lines_tooltip = d3panels.tooltip_create(d3.select("body"), vert_lines,
+                                               {tipclass:"tooltip"},
+                                               (d,i) ->
+                                                   "#{vert_line_labels[i]} = #{Math.round(d)}")
+
 
         d3.select("div#text_output")
           .html("<p>Your title is #{title} in #{this_record.Department}, #{selected_div}. " +

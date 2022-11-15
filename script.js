@@ -48,7 +48,7 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes, person_index) {
-  var all_indices, comp_salaries, d, data_to_plot, first_name, g, green, group, i, index_in_data, j, labels, last_name, len, mychart, plot_title, ref, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, y1, y2, ym;
+  var all_indices, comp_salaries, d, data_to_plot, first_name, g, green, group, i, index_in_data, labels, last_name, mychart, plot_title, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym;
   d3.select("div#chart svg").remove();
   d3.select("g.d3panels-tooltip").remove();
   d3.select("div#text_output").html("");
@@ -182,13 +182,32 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     green = "#2ECC40";
     g.append("line").attr("x1", mychart.xscale()(summary[0])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
     g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[4])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
-    ref = [1, 2, 3];
-    for (j = 0, len = ref.length; j < len; j++) {
-      i = ref[j];
-      g.append("line").attr("x1", mychart.xscale()(summary[i])).attr("x2", mychart.xscale()(summary[i])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
-    }
     g.append("line").attr("x1", mychart.xscale()(summary[1])).attr("x2", mychart.xscale()(summary[3])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y2 * 0.25).style("stroke-width", 3).style("stroke", green);
     g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym * 0.75 + y1 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
+    vert_line_labels = ["min", "25th %ile", "median", "75th %ile", "max"];
+    vert_lines = g.append("g").selectAll("empty").data(summary).enter().append("line").style("stroke-width", 3).style("stroke", green).attr("x1", function (d) {
+      return mychart.xscale()(d);
+    }).attr("x2", function (d) {
+      return mychart.xscale()(d);
+    }).attr("y1", function (d, i) {
+      if (i === 0 || i === 4) {
+        return ym * 0.9 + y2 * 0.1;
+      } else {
+        return ym * 0.75 + y2 * 0.25;
+      }
+    }).attr("y2", function (d, i) {
+      if (i === 0 || i === 4) {
+        return ym * 0.9 + y1 * 0.1;
+      } else {
+        return ym * 0.75 + y1 * 0.25;
+      }
+    });
+    // add tool tip
+    vert_lines_tooltip = d3panels.tooltip_create(d3.select("body"), vert_lines, {
+      tipclass: "tooltip"
+    }, function (d, i) {
+      return `${vert_line_labels[i]} = ${Math.round(d)}`;
+    });
     return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you. " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "You can either compare salaries in the same title across campus or " + "only within your school/division.");
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
