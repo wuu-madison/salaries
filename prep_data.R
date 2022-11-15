@@ -2,7 +2,12 @@
 library(readxl)
 library(jsonlite)
 
-x <- readxl::read_excel("Updated August 2022 All Faculty and Staff Title and Salary Information.xlsx")
+# salaries by ORR, emails and phone numbers removed
+salary_file <- "Updated August 2022 All Faculty and Staff Title and Salary Information.xlsx"
+# TTC info from https://github.com/vgXhc/TTC
+salary_range_file <- "salary_ranges_sep2022.RDS"
+
+x <- readxl::read_excel(salary_file)
 x <- as.data.frame(x)
 
 # remove $0 cases and FTE > 0.01
@@ -49,3 +54,16 @@ x <- x[, colnames(x) != "Title"]
 # convert to JSON
 y <- jsonlite::toJSON(x)
 cat(y, file="salaries.json")
+
+######################################################################
+# salary ranges
+salary_ranges <- readRDS(salary_range_file)
+salary_ranges <- as.data.frame(salary_ranges)
+
+v <- vector("list", nrow(salary_ranges))
+names(v) <- salary_ranges[,1]
+for(i in seq_along(v)) {
+    v[[i]] <- list(min=salary_ranges[i,2], max=salary_ranges[i,3])
+}
+
+cat(toJSON(v, auto_unbox=TRUE), file="salary_ranges.json")
