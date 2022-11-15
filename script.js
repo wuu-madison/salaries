@@ -334,7 +334,7 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
     } else {
       range_text = start_range_text + end_range_text;
     }
-    return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + range_text + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you " + "(across campus, in your school/division, and in your department). " + "<p>The green boxes represent the range from the 25th to 75th percentile with " + "a central line at the median, across campus and within your school/division. " + "<p>The orange line indicates the salary range for your title;" + "arrowheads on the left or right indicate no minimum or maximum salary, respectively.");
+    return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + range_text + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you " + "(across campus, in your school/division, and in your department). " + "<p>The green boxes represent the range from the 25th to 75th percentile with " + "a central line at the median, across campus and within your school/division. " + "<p>The orange line indicates the salary range for your title; " + "arrowheads on the left or right indicate no minimum or maximum salary, respectively.");
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }

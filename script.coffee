@@ -224,7 +224,7 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
                 "(across campus, in your school/division, and in your department). " +
                 "<p>The green boxes represent the range from the 25th to 75th percentile with " +
                 "a central line at the median, across campus and within your school/division. " +
-                "<p>The orange line indicates the salary range for your title;" +
+                "<p>The orange line indicates the salary range for your title; " +
                 "arrowheads on the left or right indicate no minimum or maximum salary, respectively.")
 
     else
