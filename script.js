@@ -2,53 +2,55 @@
 var five_number_summary, plot_data;
 d3.json("salaries.json").then(function (salaries) {
   return d3.json("titles.json").then(function (titles) {
-    return d3.json("divisions.json").then(function (divisions) {
-      var dropdown, i, jobcodes, opts, person_division, person_index, title, v, x;
-      dropdown = d3.select("body").select("select#division");
-      opts = dropdown.selectAll("option").data(divisions).enter().append("option").text(function (d) {
-        return d;
-      }).attr("value", function (d) {
-        return d;
-      });
-      // insert title into salaries dataset
-      salaries.forEach(function (d) {
-        return d.title = titles[d.JobCode];
-      });
-      // create object that has title -> job codes
-      jobcodes = {};
-      for (x in titles) {
-        title = titles[x];
-        if (!(jobcodes[title] != null)) {
-          jobcodes[title] = [];
-        }
-        jobcodes[title].push(x);
-      }
-      // index of people: vector with {name: first|last|div, index: numeric index}
-      person_division = function () {
-        var j, len, results;
-        results = [];
-        for (j = 0, len = salaries.length; j < len; j++) {
-          v = salaries[j];
-          results.push([v.FirstName, v.LastName, v.Division].join("|"));
-        }
-        return results;
-      }();
-      person_index = [];
-      for (i in person_division) {
-        person_index.push({
-          name: person_division[i],
-          index: i
+    return d3.json("salary_ranges.json").then(function (salary_ranges) {
+      return d3.json("divisions.json").then(function (divisions) {
+        var dropdown, i, jobcodes, opts, person_division, person_index, title, v, x;
+        dropdown = d3.select("body").select("select#division");
+        opts = dropdown.selectAll("option").data(divisions).enter().append("option").text(function (d) {
+          return d;
+        }).attr("value", function (d) {
+          return d;
         });
-      }
-      // button click -> make plot
-      return d3.select("button").on("click", function () {
-        return plot_data(salaries, divisions, jobcodes, person_index);
+        // insert title into salaries dataset
+        salaries.forEach(function (d) {
+          return d.title = titles[d.JobCode];
+        });
+        // create object that has title -> job codes
+        jobcodes = {};
+        for (x in titles) {
+          title = titles[x];
+          if (!(jobcodes[title] != null)) {
+            jobcodes[title] = [];
+          }
+          jobcodes[title].push(x);
+        }
+        // index of people: vector with {name: first|last|div, index: numeric index}
+        person_division = function () {
+          var j, len, results;
+          results = [];
+          for (j = 0, len = salaries.length; j < len; j++) {
+            v = salaries[j];
+            results.push([v.FirstName, v.LastName, v.Division].join("|"));
+          }
+          return results;
+        }();
+        person_index = [];
+        for (i in person_division) {
+          person_index.push({
+            name: person_division[i],
+            index: i
+          });
+        }
+        // button click -> make plot
+        return d3.select("button").on("click", function () {
+          return plot_data(salaries, divisions, jobcodes, salary_ranges, person_index);
+        });
       });
     });
   });
 });
-plot_data = function (salaries, divisions, jobcodes, person_index) {
-  var all_indices, comp_salaries, d, data_to_plot, first_name, g, green, group, i, index_in_data, labels, last_name, mychart, plot_title, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym;
+plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index) {
+  var all_indices, comp_salaries, d, data_to_plot, end_range_text, first_name, g, g_range, green, group, i, index_in_data, j, labels, last_name, len, mychart, orange, plot_title, range, range_max, range_min, range_text, ref, salaries_subset, salary, salary_range, scope, scope_across, selected_div, sr_range, start_range_text, summary, target_jobcodes, this_index, this_person, this_record, title, val, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym, ymax, ymin;
   d3.select("div#chart svg").remove();
   d3.selectAll("g.d3panels-tooltip").remove();
   d3.select("div#text_output").html("");
@@ -133,23 +135,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     if (this_index >= 0) {
       group[this_index] = 1;
     }
-    mychart = d3panels.dotchart({
-      xlab: "",
-      ylab: "Annual Salary ($)",
-      title: plot_title,
-      height: 300,
-      width: 800,
-      margin: {
-        left: 120,
-        top: 40,
-        right: 120,
-        bottom: 40,
-        inner: 3
-      },
-      xcategories: [1, 2],
-      xcatlabels: ["everyone", "you"],
-      horizontal: true
-    });
+    salary_range = salary_ranges[this_record.SalaryGrade];
     data_to_plot = {
       x: function () {
         var j, len, results;
@@ -168,6 +154,32 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     data_to_plot.y.push(salary);
     data_to_plot.indID.push(first_name + " " + last_name + " $" + salary);
     data_to_plot.group.push(1);
+    ymin = d3.min(data_to_plot.y);
+    if (salary_range.min !== "NA") {
+      ymin = d3.min([ymin, salary_range.min]);
+    }
+    ymax = d3.max(data_to_plot.y);
+    if (salary_range.max !== "NA") {
+      ymax = d3.max([ymax, salary_range.max]);
+    }
+    mychart = d3panels.dotchart({
+      xlab: "",
+      ylab: "Annual Salary ($)",
+      title: plot_title,
+      height: 300,
+      width: 800,
+      ylim: [ymin * 0.95, ymax * 1.05],
+      margin: {
+        left: 120,
+        top: 40,
+        right: 120,
+        bottom: 40,
+        inner: 3
+      },
+      xcategories: [1, 2],
+      xcatlabels: ["everyone", "you"],
+      horizontal: true
+    });
     mychart(d3.select("div#chart"), data_to_plot);
     mychart.points().on("mouseover", function (d) {
       return d3.select(this).attr("r", 6);
@@ -180,6 +192,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     y2 = mychart.yscale()(2);
     ym = (y1 + y2) / 2;
     green = "#2ECC40";
+    orange = "#FF851B";
     g.append("line").attr("x1", mychart.xscale()(summary[0])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
     g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[4])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
     g.append("line").attr("x1", mychart.xscale()(summary[1])).attr("x2", mychart.xscale()(summary[3])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y2 * 0.25).style("stroke-width", 3).style("stroke", green);
@@ -208,7 +221,44 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     }, function (d, i) {
       return `${vert_line_labels[i]} = $${Math.round(d)}`;
     });
-    return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you. " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "You can either compare salaries in the same title across campus or " + "only within your school/division.");
+    g_range = d3.select("div#chart svg").append("g").attr("id", "salary_range");
+    range_min = salary_range.min === "NA" ? summary[0] : salary_range.min;
+    range_max = salary_range.max === "NA" ? summary[4] : salary_range.max;
+    g_range.append("line").style("stroke-width", 3).style("stroke", orange).attr("x1", function (d) {
+      return mychart.xscale()(range_min);
+    }).attr("x2", function (d) {
+      return mychart.xscale()(range_max);
+    }).attr("y1", 2 * y2 - (ym * 0.4 + y2 * 0.6)).attr("y2", 2 * y2 - (ym * 0.4 + y2 * 0.6));
+    range = [range_min, range_max];
+    sr_range = [salary_range.min, salary_range.max];
+    ref = [0, 1];
+    for (j = 0, len = ref.length; j < len; j++) {
+      i = ref[j];
+      val = range[i];
+      if (sr_range[i] !== "NA") {
+        g_range.append("line").style("stroke-width", 3).style("stroke", orange).attr("x1", mychart.xscale()(val)).attr("x2", mychart.xscale()(val)).attr("y1", 2 * y2 - (ym * 0.4 + y2 * 0.6 + (y2 - y1) * 0.05)).attr("y2", 2 * y2 - (ym * 0.4 + y2 * 0.6 - (y2 - y1) * 0.05));
+      } else {
+        g_range.append("line").style("stroke-width", 3).style("stroke", orange).attr("x1", mychart.xscale()(val)).attr("x2", mychart.xscale()(val) + (1 - i * 2) * (y2 - y1) * 0.1).attr("y1", 2 * y2 - (ym * 0.4 + y2 * 0.6)).attr("y2", 2 * y2 - (ym * 0.4 + y2 * 0.6 - (y2 - y1) * 0.05));
+        g_range.append("line").style("stroke-width", 3).style("stroke", orange).attr("x1", mychart.xscale()(val)).attr("x2", mychart.xscale()(val) + (1 - i * 2) * (y2 - y1) * 0.1).attr("y1", 2 * y2 - (ym * 0.4 + y2 * 0.6)).attr("y2", 2 * y2 - (ym * 0.4 + y2 * 0.6 + (y2 - y1) * 0.05));
+      }
+    }
+    // min and max salary for title
+    if (salary_range.min === "NA") {
+      start_range_text = "There is no minimum salary for your title;";
+    } else {
+      start_range_text = `The minimum salary for your title is $${salary_range.min};`;
+    }
+    if (salary_range.max === "NA") {
+      end_range_text = " there is no maximum salary for your title.";
+    } else {
+      end_range_text = ` the maximum salary for your title is $${salary_range.max}.`;
+    }
+    if (salary_range.min === "NA" && salary_range.max === "NA") {
+      range_text = "Your title has neither a minimum nor maximum salary.";
+    } else {
+      range_text = start_range_text + end_range_text;
+    }
+    return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + range_text + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you. " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "The orange line indicates the salary range for your title;" + "arrowheads on the left or right indicate no minimum or maximum salary, respectively." + "<p>You can either compare salaries in the same title across campus or " + "only within your school/division.");
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }

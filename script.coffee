@@ -2,40 +2,41 @@ d3.json("salaries.json").then (salaries) ->
 
     d3.json("titles.json").then (titles) ->
 
+        d3.json("salary_ranges.json").then (salary_ranges) ->
 
-        d3.json("divisions.json").then (divisions) ->
+            d3.json("divisions.json").then (divisions) ->
 
-            dropdown = d3.select("body").select("select#division")
+                dropdown = d3.select("body").select("select#division")
 
-            opts = dropdown.selectAll("option")
-                           .data(divisions)
-                           .enter()
-                           .append("option")
-                           .text((d) -> d)
-                           .attr("value", (d) -> d)
+                opts = dropdown.selectAll("option")
+                               .data(divisions)
+                               .enter()
+                               .append("option")
+                               .text((d) -> d)
+                               .attr("value", (d) -> d)
 
-            # insert title into salaries dataset
-            salaries.forEach((d) -> d.title = titles[d.JobCode])
+                # insert title into salaries dataset
+                salaries.forEach((d) -> d.title = titles[d.JobCode])
 
-            # create object that has title -> job codes
-            jobcodes = {}
-            for x of titles
-                title = titles[x]
-                if !(jobcodes[title]?)
-                    jobcodes[title] = []
-                jobcodes[title].push(x)
+                # create object that has title -> job codes
+                jobcodes = {}
+                for x of titles
+                    title = titles[x]
+                    if !(jobcodes[title]?)
+                        jobcodes[title] = []
+                    jobcodes[title].push(x)
 
-            # index of people: vector with {name: first|last|div, index: numeric index}
-            person_division = ([v.FirstName, v.LastName, v.Division].join("|") for v in salaries)
-            person_index = []
-            for i of person_division
-                person_index.push({name:person_division[i], index:i})
+                # index of people: vector with {name: first|last|div, index: numeric index}
+                person_division = ([v.FirstName, v.LastName, v.Division].join("|") for v in salaries)
+                person_index = []
+                for i of person_division
+                    person_index.push({name:person_division[i], index:i})
 
-            # button click -> make plot
-            d3.select("button")
-              .on("click", () -> plot_data(salaries, divisions, jobcodes, person_index))
+                # button click -> make plot
+                d3.select("button")
+                  .on("click", () -> plot_data(salaries, divisions, jobcodes, salary_ranges, person_index))
 
-plot_data = (salaries, divisions, jobcodes, person_index) ->
+plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
     d3.select("div#chart svg").remove()
     d3.selectAll("g.d3panels-tooltip").remove()
     d3.select("div#text_output").html("")
@@ -86,16 +87,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         if this_index >= 0
             group[this_index] = 1
 
-        mychart = d3panels.dotchart({
-            xlab:"",
-            ylab:"Annual Salary ($)",
-            title:plot_title,
-            height:300,
-            width:800,
-            margin: {left:120, top:40, right:120, bottom:40, inner:3},
-            xcategories: [1, 2],
-            xcatlabels: ["everyone", "you"],
-            horizontal:true})
+        salary_range = salary_ranges[this_record.SalaryGrade]
 
         data_to_plot = {x:(1 for d in comp_salaries), y:comp_salaries, indID:labels, group:group}
 
@@ -103,6 +95,23 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         data_to_plot.y.push(salary)
         data_to_plot.indID.push(first_name + " " + last_name + " $" + salary)
         data_to_plot.group.push(1)
+
+        ymin = d3.min(data_to_plot.y)
+        ymin = d3.min([ymin, salary_range.min]) unless salary_range.min == "NA"
+        ymax = d3.max(data_to_plot.y)
+        ymax = d3.max([ymax, salary_range.max]) unless salary_range.max == "NA"
+
+        mychart = d3panels.dotchart({
+            xlab:"",
+            ylab:"Annual Salary ($)",
+            title:plot_title,
+            height:300,
+            width:800,
+            ylim:[ymin*0.95,ymax*1.05],
+            margin: {left:120, top:40, right:120, bottom:40, inner:3},
+            xcategories: [1, 2],
+            xcatlabels: ["everyone", "you"],
+            horizontal:true})
 
         mychart(d3.select("div#chart"), data_to_plot)
 
@@ -119,6 +128,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         ym = (y1+y2)/2
 
         green = "#2ECC40"
+        orange = "#FF851B"
 
         g.append("line")
          .attr("x1", mychart.xscale()(summary[0]))
@@ -175,15 +185,69 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
                                                (d,i) ->
                                                    "#{vert_line_labels[i]} = $#{Math.round(d)}")
 
+        g_range = d3.select("div#chart svg").append("g").attr("id", "salary_range")
+        range_min = if salary_range.min == "NA" then summary[0] else salary_range.min
+        range_max = if salary_range.max == "NA" then summary[4] else salary_range.max
+        g_range.append("line")
+          .style("stroke-width", 3)
+          .style("stroke", orange)
+          .attr("x1", (d) -> mychart.xscale()(range_min))
+          .attr("x2", (d) -> mychart.xscale()(range_max))
+          .attr("y1", 2*y2-(ym*0.4 + y2*0.6))
+          .attr("y2", 2*y2-(ym*0.4 + y2*0.6))
+        range = [range_min, range_max]
+        sr_range = [salary_range.min, salary_range.max]
+        for i in [0,1]
+            val = range[i]
+            if sr_range[i] != "NA"
+                g_range.append("line")
+                  .style("stroke-width", 3)
+                  .style("stroke", orange)
+                  .attr("x1", mychart.xscale()(val))
+                  .attr("x2", mychart.xscale()(val))
+                  .attr("y1", 2*y2-(ym*0.4 + y2*0.6 + (y2-y1)*0.05))
+                  .attr("y2", 2*y2-(ym*0.4 + y2*0.6 - (y2-y1)*0.05))
+            else
+                g_range.append("line")
+                  .style("stroke-width", 3)
+                  .style("stroke", orange)
+                  .attr("x1", mychart.xscale()(val))
+                  .attr("x2", mychart.xscale()(val) + (1-i*2)*(y2-y1)*0.1)
+                  .attr("y1", 2*y2-(ym*0.4 + y2*0.6))
+                  .attr("y2", 2*y2-(ym*0.4 + y2*0.6 - (y2-y1)*0.05))
+                g_range.append("line")
+                  .style("stroke-width", 3)
+                  .style("stroke", orange)
+                  .attr("x1", mychart.xscale()(val))
+                  .attr("x2", mychart.xscale()(val) + (1-i*2)*(y2-y1)*0.1)
+                  .attr("y1", 2*y2-(ym*0.4 + y2*0.6))
+                  .attr("y2", 2*y2-(ym*0.4 + y2*0.6 + (y2-y1)*0.05))
+
+        # min and max salary for title
+        if salary_range.min=="NA"
+            start_range_text = "There is no minimum salary for your title;"
+        else
+            start_range_text = "The minimum salary for your title is $#{salary_range.min};"
+        if salary_range.max=="NA"
+            end_range_text = " there is no maximum salary for your title."
+        else
+            end_range_text = " the maximum salary for your title is $#{salary_range.max}."
+        if salary_range.min=="NA" and salary_range.max=="NA"
+            range_text = "Your title has neither a minimum nor maximum salary."
+        else
+            range_text = start_range_text + end_range_text;
 
         d3.select("div#text_output")
           .html("<p>Your title is #{title} in #{this_record.Department}, #{selected_div}. " +
                 "Your annual salary (adjusted for FTE) is $#{salary}. " +
+                range_text +
                 "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " +
                 "that have the same job title as you. " +
                 "The green box represents the range from the 25th to 75th percentile; " +
                 "the central green line is the median. " +
-                "You can either compare salaries in the same title across campus or " +
+                "The orange line indicates the salary range for your title;" +
+                "arrowheads on the left or right indicate no minimum or maximum salary, respectively." +
+                "<p>You can either compare salaries in the same title across campus or " +
                 "only within your school/division.")
 
     else
