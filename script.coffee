@@ -37,7 +37,7 @@ d3.json("salaries.json").then (salaries) ->
 
 plot_data = (salaries, divisions, jobcodes, person_index) ->
     d3.select("div#chart svg").remove()
-    d3.select("g.d3panels-tooltip").remove()
+    d3.selectAll("g.d3panels-tooltip").remove()
     d3.select("div#text_output").html("")
 
     # grab form data
@@ -88,7 +88,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
 
         mychart = d3panels.dotchart({
             xlab:"",
-            ylab:"Salaries",
+            ylab:"Annual Salary ($)",
             title:plot_title,
             height:300,
             width:800,
@@ -173,7 +173,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
         vert_lines_tooltip = d3panels.tooltip_create(d3.select("body"), vert_lines,
                                                {tipclass:"tooltip"},
                                                (d,i) ->
-                                                   "#{vert_line_labels[i]} = #{Math.round(d)}")
+                                                   "#{vert_line_labels[i]} = $#{Math.round(d)}")
 
 
         d3.select("div#text_output")

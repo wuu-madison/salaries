@@ -50,7 +50,7 @@ d3.json("salaries.json").then(function (salaries) {
 plot_data = function (salaries, divisions, jobcodes, person_index) {
   var all_indices, comp_salaries, d, data_to_plot, first_name, g, green, group, i, index_in_data, labels, last_name, mychart, plot_title, salaries_subset, salary, scope, scope_across, selected_div, summary, target_jobcodes, this_index, this_person, this_record, title, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym;
   d3.select("div#chart svg").remove();
-  d3.select("g.d3panels-tooltip").remove();
+  d3.selectAll("g.d3panels-tooltip").remove();
   d3.select("div#text_output").html("");
   // grab form data
   last_name = d3.select("input#last_name").property("value").toUpperCase();
@@ -135,7 +135,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     }
     mychart = d3panels.dotchart({
       xlab: "",
-      ylab: "Salaries",
+      ylab: "Annual Salary ($)",
       title: plot_title,
       height: 300,
       width: 800,
@@ -206,7 +206,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     vert_lines_tooltip = d3panels.tooltip_create(d3.select("body"), vert_lines, {
       tipclass: "tooltip"
     }, function (d, i) {
-      return `${vert_line_labels[i]} = ${Math.round(d)}`;
+      return `${vert_line_labels[i]} = $${Math.round(d)}`;
     });
     return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you. " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "You can either compare salaries in the same title across campus or " + "only within your school/division.");
   } else {
