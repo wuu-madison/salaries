@@ -5,13 +5,13 @@ library(jsonlite)
 x <- readxl::read_excel("Updated August 2022 All Faculty and Staff Title and Salary Information.xlsx")
 x <- as.data.frame(x)
 
-# remove $0 cases
-x <- x[x$"Current Annual Contracted Salary">0,]
+# remove $0 cases and FTE > 0.01
+x <- x[x$"Current Annual Contracted Salary">1000 & x$"Full-time Equivalent" > 0.01,]
 
 # reduce columns
-x <- x[,c("First Name", "Last Name", "Division", "Title", "Salary Grade",
+x <- x[,c("First Name", "Last Name", "Division", "Department", "Title", "Salary Grade",
           "Current Annual Contracted Salary", "Job Code")]
-colnames(x) <- c("FirstName", "LastName", "Division", "Title", "SalaryGrade", "AnnualSalary", "JobCode")
+colnames(x) <- c("FirstName", "LastName", "Division", "Department", "Title", "SalaryGrade", "AnnualSalary", "JobCode")
 
 # remove duplicates
 z <- apply(x, 1, paste, collapse="|")
