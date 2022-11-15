@@ -50,7 +50,7 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index) {
-  var all_indices, comp_salaries, d, data_to_plot, end_range_text, first_name, g, g_range, green, group, i, index_in_data, j, labels, last_name, len, mychart, orange, orange_text, plot_title, range, range_max, range_min, range_text, ref, salaries_subset, salary, salary_range, scope, scope_across, selected_div, sr_range, start_range_text, summary, target_jobcodes, this_index, this_person, this_record, title, val, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym, ymax, ymin;
+  var all_indices, comp_salaries, d, data_to_plot, end_range_text, first_name, g, g_range, green, group, i, index_in_data, j, labels, last_name, len, mychart, orange, orange_text, range, range_max, range_min, range_text, ref, salaries_dept, salaries_division, salaries_subset, salary, salary_range, selected_div, sr_range, start_range_text, summary, target_jobcodes, this_index, this_person, this_record, title, val, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym, ymax, ymin;
   d3.select("div#chart svg").remove();
   d3.selectAll("g.d3panels-tooltip").remove();
   d3.select("div#text_output").html("");
@@ -59,9 +59,6 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
   first_name = d3.select("input#first_name").property("value").toUpperCase();
   // division
   selected_div = d3.select("select#division option:checked").text();
-  // scope
-  scope_across = d3.select("input#across").property("checked");
-  scope = scope_across ? "across" : "within";
   // look for the person in the data
   this_person = [first_name, last_name, divisions.indexOf(selected_div) + 1].join("|");
   index_in_data = person_index.find(function (d) {
@@ -82,18 +79,11 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
     title = this_record.title;
     salary = this_record.AnnualSalary;
     target_jobcodes = jobcodes[title];
+    console.log("hello!");
+    // across campus
     salaries_subset = salaries.filter(function (d) {
       return target_jobcodes.indexOf(d.JobCode) >= 0;
     });
-    if (scope === "within") {
-      // subset by division
-      plot_title = `\"${title}\" within ${selected_div}`;
-      salaries_subset = salaries_subset.filter(function (d) {
-        return d.Division === this_record.Division;
-      });
-    } else {
-      plot_title = `\"${title}\" across campus`;
-    }
     comp_salaries = function () {
       var j, len, results;
       results = [];
@@ -112,7 +102,6 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
       }
       return results;
     }();
-    // different color for the identified individual
     group = function () {
       var j, len, results;
       results = [];
@@ -135,7 +124,6 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
     if (this_index >= 0) {
       group[this_index] = 1;
     }
-    salary_range = salary_ranges[this_record.SalaryGrade];
     data_to_plot = {
       x: function () {
         var j, len, results;
@@ -150,10 +138,122 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
       indID: labels,
       group: group
     };
-    data_to_plot.x.push(2);
+    // within division
+    salaries_division = salaries_subset.filter(function (d) {
+      return d.Division === this_record.Division;
+    });
+    data_to_plot.x = data_to_plot.x.concat(function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_division.length; j < len; j++) {
+        d = salaries_division[j];
+        results.push(2);
+      }
+      return results;
+    }());
+    data_to_plot.y = data_to_plot.y.concat(function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_division.length; j < len; j++) {
+        d = salaries_division[j];
+        results.push(d.AnnualSalary);
+      }
+      return results;
+    }());
+    data_to_plot.indID = data_to_plot.indID.concat(function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_division.length; j < len; j++) {
+        d = salaries_division[j];
+        results.push(d.FirstName + " " + d.LastName + " $" + d.AnnualSalary);
+      }
+      return results;
+    }());
+    group = function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_division.length; j < len; j++) {
+        d = salaries_division[j];
+        results.push(2);
+      }
+      return results;
+    }();
+    this_index = function () {
+      var results;
+      results = [];
+      for (i in salaries_division) {
+        if (salaries_division[i].FirstName === first_name && salaries_division[i].LastName === last_name) {
+          results.push(i);
+        }
+      }
+      return results;
+    }();
+    if (this_index >= 0) {
+      group[this_index] = 1;
+    }
+    data_to_plot.group = data_to_plot.group.concat(group);
+    console.log(salaries_division);
+    // within department
+    salaries_dept = salaries_division.filter(function (d) {
+      return d.Department === this_record.Department;
+    });
+    data_to_plot.x = data_to_plot.x.concat(function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_dept.length; j < len; j++) {
+        d = salaries_dept[j];
+        results.push(3);
+      }
+      return results;
+    }());
+    data_to_plot.y = data_to_plot.y.concat(function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_dept.length; j < len; j++) {
+        d = salaries_dept[j];
+        results.push(d.AnnualSalary);
+      }
+      return results;
+    }());
+    data_to_plot.indID = data_to_plot.indID.concat(function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_dept.length; j < len; j++) {
+        d = salaries_dept[j];
+        results.push(d.FirstName + " " + d.LastName + " $" + d.AnnualSalary);
+      }
+      return results;
+    }());
+    group = function () {
+      var j, len, results;
+      results = [];
+      for (j = 0, len = salaries_dept.length; j < len; j++) {
+        d = salaries_dept[j];
+        results.push(2);
+      }
+      return results;
+    }();
+    this_index = function () {
+      var results;
+      results = [];
+      for (i in salaries_dept) {
+        if (salaries_dept[i].FirstName === first_name && salaries_dept[i].LastName === last_name) {
+          results.push(i);
+        }
+      }
+      return results;
+    }();
+    if (this_index >= 0) {
+      group[this_index] = 1;
+    }
+    data_to_plot.group = data_to_plot.group.concat(group);
+    salary_range = salary_ranges[this_record.SalaryGrade];
+    // this individual
+    data_to_plot.x.push(4);
     data_to_plot.y.push(salary);
     data_to_plot.indID.push(first_name + " " + last_name + " $" + salary);
     data_to_plot.group.push(1);
+    console.log(data_to_plot);
     ymin = d3.min(data_to_plot.y);
     if (salary_range.min !== "NA") {
       ymin = d3.min([ymin, salary_range.min]);
@@ -165,19 +265,19 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
     mychart = d3panels.dotchart({
       xlab: "",
       ylab: "Annual Salary ($)",
-      title: plot_title,
-      height: 300,
+      title: title,
+      height: 600,
       width: 800,
       ylim: [ymin * 0.95, ymax * 1.05],
       margin: {
-        left: 120,
+        left: 160,
         top: 40,
-        right: 120,
+        right: 160,
         bottom: 40,
         inner: 3
       },
-      xcategories: [1, 2],
-      xcatlabels: ["everyone", "you"],
+      xcategories: [1, 2, 3, 4],
+      xcatlabels: ["everyone", "your school/division", "your department", "you"],
       horizontal: true
     });
     mychart(d3.select("div#chart"), data_to_plot);
@@ -260,7 +360,7 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
     } else {
       range_text = start_range_text + end_range_text;
     }
-    return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + range_text + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you. " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "The orange line indicates the salary range for your title;" + "arrowheads on the left or right indicate no minimum or maximum salary, respectively." + "<p>You can either compare salaries in the same title across campus or " + "only within your school/division.");
+    return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + range_text + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you " + "(across campus, in your school/division, and in your department). " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "The orange line indicates the salary range for your title;" + "arrowheads on the left or right indicate no minimum or maximum salary, respectively.");
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }
