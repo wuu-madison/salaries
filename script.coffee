@@ -79,7 +79,8 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
         # within division
         salaries_division = salaries_subset.filter((d) -> d.Division == this_record.Division)
         data_to_plot.x = data_to_plot.x.concat(2 for d in salaries_division)
-        data_to_plot.y = data_to_plot.y.concat(d.AnnualSalary for d in salaries_division)
+        comp_salaries_division = (d.AnnualSalary for d in salaries_division)
+        data_to_plot.y = data_to_plot.y.concat(comp_salaries_division)
         data_to_plot.indID = data_to_plot.indID.concat(d.FirstName + " " + d.LastName + " $" + d.AnnualSalary for d in salaries_division)
         group = (2 for d in salaries_division)
         this_index = (i for i of salaries_division when salaries_division[i].FirstName==first_name and salaries_division[i].LastName==last_name)
@@ -135,65 +136,25 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
 
         summary = five_number_summary(comp_salaries)
 
-        g = d3.select("div#chart svg").append("g").attr("id", "boxplot")
         y1 = mychart.yscale()(1)
         y2 = mychart.yscale()(2)
-        ym = (y1+y2)/2
 
-        g.append("line")
-         .attr("x1", mychart.xscale()(summary[0]))
-         .attr("x2", mychart.xscale()(summary[1]))
-         .attr("y1", ym)
-         .attr("y2", ym)
-         .style("stroke-width", 3)
-         .style("stroke", green)
-        g.append("line")
-         .attr("x1", mychart.xscale()(summary[3]))
-         .attr("x2", mychart.xscale()(summary[4]))
-         .attr("y1", ym)
-         .attr("y2", ym)
-         .style("stroke-width", 3)
-         .style("stroke", green)
-        g.append("line")
-         .attr("x1", mychart.xscale()(summary[1]))
-         .attr("x2", mychart.xscale()(summary[3]))
-         .attr("y1", ym*0.75+y2*0.25)
-         .attr("y2", ym*0.75+y2*0.25)
-         .style("stroke-width", 3)
-         .style("stroke", green)
-        g.append("line")
-         .attr("x1", mychart.xscale()(summary[3]))
-         .attr("x2", mychart.xscale()(summary[1]))
-         .attr("y1", ym*0.75+y1*0.25)
-         .attr("y2", ym*0.75+y1*0.25)
-         .style("stroke-width", 3)
-         .style("stroke", green)
+        make_boxplot(summary, d3.select("div#chart svg"),
+                     mychart.xscale(), (y1+y2)/2, (y2-y1)/2,
+                     3, green)
 
-        vert_line_labels = ["min", "25th %ile", "median", "75th %ile", "max"]
 
-        vert_lines = g.append("g").selectAll("empty")
-                      .data(summary)
-                      .enter()
-                      .append("line")
-                      .style("stroke-width", 3)
-                      .style("stroke", green)
-                      .attr("x1", (d) -> mychart.xscale()(d))
-                      .attr("x2", (d) -> mychart.xscale()(d))
-                      .attr("y1", (d,i) ->
-                          if i==0 or i==4
-                              return ym*0.9 + y2*0.1
-                          else
-                              return ym*0.75 + y2*0.25)
-                      .attr("y2", (d,i) ->
-                          if i==0 or i==4
-                              return ym*0.9 + y1*0.1
-                          else
-                              return ym*0.75 + y1*0.25)
-        # add tool tip
-        vert_lines_tooltip = d3panels.tooltip_create(d3.select("body"), vert_lines,
-                                               {tipclass:"tooltip"},
-                                               (d,i) ->
-                                                   "#{vert_line_labels[i]} = $#{Math.round(d)}")
+        summary_div = five_number_summary(comp_salaries_division)
+
+        y3 = mychart.yscale()(3)
+
+        make_boxplot(summary_div, d3.select("div#chart svg"),
+                     mychart.xscale(), (y2+y3)/2, (y2-y1)/2,
+                     3, green)
+
+
+        yd = (y2-y1)/16
+        ypos = mychart.yscale()(4) + yd*3
 
         g_range = d3.select("div#chart svg").append("g").attr("id", "salary_range")
         range_min = if salary_range.min == "NA" then summary[0] else salary_range.min
@@ -203,8 +164,8 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
           .style("stroke", orange)
           .attr("x1", (d) -> mychart.xscale()(range_min))
           .attr("x2", (d) -> mychart.xscale()(range_max))
-          .attr("y1", 2*y2-(ym*0.4 + y2*0.6))
-          .attr("y2", 2*y2-(ym*0.4 + y2*0.6))
+          .attr("y1", ypos)
+          .attr("y2", ypos)
         range = [range_min, range_max]
         sr_range = [salary_range.min, salary_range.max]
         for i in [0,1]
@@ -215,28 +176,28 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
                   .style("stroke", orange)
                   .attr("x1", mychart.xscale()(val))
                   .attr("x2", mychart.xscale()(val))
-                  .attr("y1", 2*y2-(ym*0.4 + y2*0.6 + (y2-y1)*0.05))
-                  .attr("y2", 2*y2-(ym*0.4 + y2*0.6 - (y2-y1)*0.05))
+                  .attr("y1", ypos-yd)
+                  .attr("y2", ypos+yd)
             else
                 g_range.append("line")
                   .style("stroke-width", 3)
                   .style("stroke", orange)
                   .attr("x1", mychart.xscale()(val))
                   .attr("x2", mychart.xscale()(val) + (1-i*2)*(y2-y1)*0.1)
-                  .attr("y1", 2*y2-(ym*0.4 + y2*0.6))
-                  .attr("y2", 2*y2-(ym*0.4 + y2*0.6 - (y2-y1)*0.05))
+                  .attr("y1", ypos)
+                  .attr("y2", ypos+yd)
                 g_range.append("line")
                   .style("stroke-width", 3)
                   .style("stroke", orange)
                   .attr("x1", mychart.xscale()(val))
                   .attr("x2", mychart.xscale()(val) + (1-i*2)*(y2-y1)*0.1)
-                  .attr("y1", 2*y2-(ym*0.4 + y2*0.6))
-                  .attr("y2", 2*y2-(ym*0.4 + y2*0.6 + (y2-y1)*0.05))
+                  .attr("y1", ypos)
+                  .attr("y2", ypos-yd)
         g_range.append("text")
                .text("salary range for title")
                .attr("fill", orange_text)
                .attr("x", mychart.xscale()(range[1]))
-               .attr("y", 2*y2-(ym*0.4 + y2*0.6 - (y2-y1)*0.2))
+               .attr("y", ypos + 3*yd)
                .style("dominant-baseline", "top")
                .style("text-anchor", "end")
 
@@ -302,3 +263,63 @@ five_number_summary = (x) ->
     upper = (x[n-below-2]*weight1 + x[n-below-1]*weight2)
 
     [min, lower, median, upper, max]
+
+make_boxplot = (values, selection, xscale, ypos, boxheight, stroke_width, stroke) ->
+
+        g = selection.append("g").attr("id", "boxplot")
+
+        g.append("line")
+         .attr("x1", xscale(values[0]))
+         .attr("x2", xscale(values[1]))
+         .attr("y1", ypos)
+         .attr("y2", ypos)
+         .style("stroke-width", stroke_width)
+         .style("stroke", stroke)
+        g.append("line")
+         .attr("x1", xscale(values[3]))
+         .attr("x2", xscale(values[4]))
+         .attr("y1", ypos)
+         .attr("y2", ypos)
+         .style("stroke-width", stroke_width)
+         .style("stroke", stroke)
+        g.append("line")
+         .attr("x1", xscale(values[1]))
+         .attr("x2", xscale(values[3]))
+         .attr("y1", ypos + boxheight/4)
+         .attr("y2", ypos + boxheight/4)
+         .style("stroke-width", stroke_width)
+         .style("stroke", stroke)
+        g.append("line")
+         .attr("x1", xscale(values[3]))
+         .attr("x2", xscale(values[1]))
+         .attr("y1", ypos - boxheight/4)
+         .attr("y2", ypos - boxheight/4)
+         .style("stroke-width", stroke_width)
+         .style("stroke", stroke)
+
+        vert_line_labels = ["min", "25th %ile", "median", "75th %ile", "max"]
+
+        vert_lines = g.append("g").selectAll("empty")
+                      .data(values)
+                      .enter()
+                      .append("line")
+                      .style("stroke-width", stroke_width)
+                      .style("stroke", stroke)
+                      .attr("x1", xscale)
+                      .attr("x2", xscale)
+                      .attr("y1", (d,i) ->
+                          if i==0 or i==4
+                              return ypos-boxheight/8
+                          else
+                              return ypos-boxheight/4)
+                      .attr("y2", (d,i) ->
+                          if i==0 or i==4
+                              return ypos+boxheight/8
+                          else
+                              return ypos+boxheight/4)
+
+        # add tool tip
+        vert_lines_tooltip = d3panels.tooltip_create(d3.select("body"), vert_lines,
+                                               {tipclass:"tooltip"},
+                                               (d,i) ->
+                                                   "#{vert_line_labels[i]} = $#{Math.round(d)}")
