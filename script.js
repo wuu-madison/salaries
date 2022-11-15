@@ -106,7 +106,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
       results = [];
       for (j = 0, len = salaries_subset.length; j < len; j++) {
         d = salaries_subset[j];
-        results.push(d.FirstName + " " + d.LastName);
+        results.push(d.FirstName + " " + d.LastName + " $" + d.AnnualSalary);
       }
       return results;
     }();
@@ -166,7 +166,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     };
     data_to_plot.x.push(2);
     data_to_plot.y.push(salary);
-    data_to_plot.indID.push(first_name + " " + last_name);
+    data_to_plot.indID.push(first_name + " " + last_name + " $" + salary);
     data_to_plot.group.push(1);
     mychart(d3.select("div#chart"), data_to_plot);
     mychart.points().on("mouseover", function (d) {

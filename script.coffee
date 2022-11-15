@@ -78,7 +78,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
             plot_title = "\"#{title}\" across campus"
 
         comp_salaries = (d.AnnualSalary for d in salaries_subset)
-        labels = (d.FirstName + " " + d.LastName for d in salaries_subset)
+        labels = (d.FirstName + " " + d.LastName + " $" + d.AnnualSalary for d in salaries_subset)
 
         # different color for the identified individual
         group = (2 for d in salaries_subset)
@@ -101,7 +101,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
 
         data_to_plot.x.push(2)
         data_to_plot.y.push(salary)
-        data_to_plot.indID.push(first_name + " " + last_name)
+        data_to_plot.indID.push(first_name + " " + last_name + " $" + salary)
         data_to_plot.group.push(1)
 
         mychart(d3.select("div#chart"), data_to_plot)
