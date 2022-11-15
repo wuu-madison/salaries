@@ -158,7 +158,7 @@ plot_data = (salaries, divisions, jobcodes, person_index) ->
          .style("stroke", green)
 
         d3.select("div#text_output")
-          .html("<p>Your title is #{title} in the #{selected_div}. " +
+          .html("<p>Your title is #{title} in #{this_record.Department}, #{selected_div}. " +
                 "Your annual salary (adjusted for FTE) is $#{salary}. " +
                 "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " +
                 "that have the same job title as you. " +

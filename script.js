@@ -189,7 +189,7 @@ plot_data = function (salaries, divisions, jobcodes, person_index) {
     }
     g.append("line").attr("x1", mychart.xscale()(summary[1])).attr("x2", mychart.xscale()(summary[3])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y2 * 0.25).style("stroke-width", 3).style("stroke", green);
     g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym * 0.75 + y1 * 0.25).attr("y2", ym * 0.75 + y1 * 0.25).style("stroke-width", 3).style("stroke", green);
-    return d3.select("div#text_output").html(`<p>Your title is ${title} in the ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you. " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "You can either compare salaries in the same title across campus or " + "only within your school/division.");
+    return d3.select("div#text_output").html(`<p>Your title is ${title} in ${this_record.Department}, ${selected_div}. ` + `Your annual salary (adjusted for FTE) is $${salary}. ` + "<p>On top, the plot shows the actual salaries of all other employees (blue dots) " + "that have the same job title as you. " + "The green box represents the range from the 25th to 75th percentile; " + "the central green line is the median. " + "You can either compare salaries in the same title across campus or " + "only within your school/division.");
   } else {
     return d3.select("div#chart").text(`${first_name} ${last_name} not found in ${selected_div}`); // individual was found
   }
