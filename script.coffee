@@ -129,6 +129,7 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
 
         green = "#2ECC40"
         orange = "#FF851B"
+        orange_text = "#dF650B"
 
         g.append("line")
          .attr("x1", mychart.xscale()(summary[0]))
@@ -222,6 +223,13 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
                   .attr("x2", mychart.xscale()(val) + (1-i*2)*(y2-y1)*0.1)
                   .attr("y1", 2*y2-(ym*0.4 + y2*0.6))
                   .attr("y2", 2*y2-(ym*0.4 + y2*0.6 + (y2-y1)*0.05))
+        g_range.append("text")
+               .text("salary range for title")
+               .attr("fill", orange_text)
+               .attr("x", mychart.xscale()(range[1]))
+               .attr("y", 2*y2-(ym*0.4 + y2*0.6 - (y2-y1)*0.2))
+               .style("dominant-baseline", "top")
+               .style("text-anchor", "end")
 
         # min and max salary for title
         if salary_range.min=="NA"

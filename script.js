@@ -50,7 +50,7 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index) {
-  var all_indices, comp_salaries, d, data_to_plot, end_range_text, first_name, g, g_range, green, group, i, index_in_data, j, labels, last_name, len, mychart, orange, plot_title, range, range_max, range_min, range_text, ref, salaries_subset, salary, salary_range, scope, scope_across, selected_div, sr_range, start_range_text, summary, target_jobcodes, this_index, this_person, this_record, title, val, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym, ymax, ymin;
+  var all_indices, comp_salaries, d, data_to_plot, end_range_text, first_name, g, g_range, green, group, i, index_in_data, j, labels, last_name, len, mychart, orange, orange_text, plot_title, range, range_max, range_min, range_text, ref, salaries_subset, salary, salary_range, scope, scope_across, selected_div, sr_range, start_range_text, summary, target_jobcodes, this_index, this_person, this_record, title, val, vert_line_labels, vert_lines, vert_lines_tooltip, y1, y2, ym, ymax, ymin;
   d3.select("div#chart svg").remove();
   d3.selectAll("g.d3panels-tooltip").remove();
   d3.select("div#text_output").html("");
@@ -193,6 +193,7 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
     ym = (y1 + y2) / 2;
     green = "#2ECC40";
     orange = "#FF851B";
+    orange_text = "#dF650B";
     g.append("line").attr("x1", mychart.xscale()(summary[0])).attr("x2", mychart.xscale()(summary[1])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
     g.append("line").attr("x1", mychart.xscale()(summary[3])).attr("x2", mychart.xscale()(summary[4])).attr("y1", ym).attr("y2", ym).style("stroke-width", 3).style("stroke", green);
     g.append("line").attr("x1", mychart.xscale()(summary[1])).attr("x2", mychart.xscale()(summary[3])).attr("y1", ym * 0.75 + y2 * 0.25).attr("y2", ym * 0.75 + y2 * 0.25).style("stroke-width", 3).style("stroke", green);
@@ -242,6 +243,7 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
         g_range.append("line").style("stroke-width", 3).style("stroke", orange).attr("x1", mychart.xscale()(val)).attr("x2", mychart.xscale()(val) + (1 - i * 2) * (y2 - y1) * 0.1).attr("y1", 2 * y2 - (ym * 0.4 + y2 * 0.6)).attr("y2", 2 * y2 - (ym * 0.4 + y2 * 0.6 + (y2 - y1) * 0.05));
       }
     }
+    g_range.append("text").text("salary range for title").attr("fill", orange_text).attr("x", mychart.xscale()(range[1])).attr("y", 2 * y2 - (ym * 0.4 + y2 * 0.6 - (y2 - y1) * 0.2)).style("dominant-baseline", "top").style("text-anchor", "end");
     // min and max salary for title
     if (salary_range.min === "NA") {
       start_range_text = "There is no minimum salary for your title;";
