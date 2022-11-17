@@ -50,7 +50,7 @@ d3.json("salaries.json").then(function (salaries) {
   });
 });
 plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index) {
-  var all_indices, comp_salaries, comp_salaries_division, d, data_to_plot, end_range_text, first_name, g_range, green, group, i, index_in_data, j, labels, last_name, len, mychart, orange, orange_text, range, range_max, range_min, range_text, ref, salaries_dept, salaries_division, salaries_subset, salary, salary_range, selected_div, sr_range, start_range_text, summary, summary_div, target_jobcodes, this_index, this_person, this_record, title, val, y1, y2, y3, yd, ymax, ymin, ypos;
+  var all_indices, comp_salaries, comp_salaries_division, d, data_to_plot, end_range_text, first_name, g_range, green, group, height, i, index_in_data, j, labels, last_name, len, mychart, orange, orange_text, range, range_max, range_min, range_text, ref, salaries_dept, salaries_division, salaries_subset, salary, salary_range, selected_div, sr_range, start_range_text, summary, summary_div, target_jobcodes, this_index, this_person, this_record, title, val, width, y1, y2, y3, yd, ymax, ymin, ypos;
   d3.select("div#chart svg").remove();
   d3.selectAll("g.d3panels-tooltip").remove();
   d3.select("div#text_output").html("");
@@ -260,12 +260,15 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
     if (salary_range.max !== "NA") {
       ymax = d3.max([ymax, salary_range.max]);
     }
+    // svg height and width
+    height = 600;
+    width = 600 * 1.5;
     mychart = d3panels.dotchart({
       xlab: "",
       ylab: "Annual Salary ($)",
       title: title,
-      height: 600,
-      width: 900,
+      height: height,
+      width: width,
       ylim: [ymin * 0.95, ymax * 1.05],
       margin: {
         left: 160,
@@ -279,6 +282,7 @@ plot_data = function (salaries, divisions, jobcodes, salary_ranges, person_index
       horizontal: true
     });
     mychart(d3.select("div#chart"), data_to_plot);
+    d3.select("svg").attr("viewBox", `0 0 ${width} ${height}`);
     mychart.points().on("mouseover", function (d) {
       return d3.select(this).attr("r", 6);
     }).on("mouseout", function (d) {

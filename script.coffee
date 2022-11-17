@@ -112,12 +112,16 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
         ymax = d3.max(data_to_plot.y)
         ymax = d3.max([ymax, salary_range.max]) unless salary_range.max == "NA"
 
+        # svg height and width
+        height = 600
+        width = 600*1.5
+
         mychart = d3panels.dotchart({
             xlab:"",
             ylab:"Annual Salary ($)",
             title:title,
-            height:600,
-            width:900,
+            height:height,
+            width:width,
             ylim:[ymin*0.95,ymax*1.05],
             margin: {left:160, top:40, right:160, bottom:40, inner:3},
             xcategories: [1, 2, 3, 4],
@@ -125,6 +129,8 @@ plot_data = (salaries, divisions, jobcodes, salary_ranges, person_index) ->
             horizontal:true})
 
         mychart(d3.select("div#chart"), data_to_plot)
+
+        d3.select("svg").attr("viewBox", "0 0 #{width} #{height}")
 
         mychart.points()
             .on "mouseover", (d) -> d3.select(this).attr("r", 6)
