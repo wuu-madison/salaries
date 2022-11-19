@@ -23,6 +23,11 @@ div#text_output {
         flex-direction: row;
         width: 100%;
     }
+
+    div#text_output {
+        margin-left: 20px;
+        margin-right: 80px;
+    }
 }
 
 /* narrow screen: put chart below form; make form full-width */
