@@ -3,7 +3,7 @@ library(readxl)
 library(jsonlite)
 
 # salaries by ORR, emails and phone numbers removed
-salary_file <- "Updated August 2022 All Faculty and Staff Title and Salary Information.xlsx"
+salary_file <- "Updated 2023-02 All Faculty and Staff Title and Salary Information.xlsx"
 # TTC info from https://github.com/vgXhc/TTC
 salary_range_file <- "salary_ranges_sep2022.RDS"
 
@@ -11,11 +11,11 @@ x <- readxl::read_excel(salary_file)
 x <- as.data.frame(x)
 
 # remove $0 cases and FTE > 0.01
-x <- x[x$"Current Annual Contracted Salary">1000 & x$"Full-time Equivalent" > 0.01,]
+x <- x[x$"Annual Full Salary">1000 & x$"Full-time Equivalent" > 0.01,]
 
 # reduce columns
 x <- x[,c("First Name", "Last Name", "Division", "Department", "Title", "Salary Grade",
-          "Current Annual Contracted Salary", "Job Code")]
+          "Annual Full Salary", "Job Code")]
 colnames(x) <- c("FirstName", "LastName", "Division", "Department", "Title", "SalaryGrade", "AnnualSalary", "JobCode")
 
 # remove duplicates
