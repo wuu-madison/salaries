@@ -3,9 +3,9 @@ library(readxl)
 library(jsonlite)
 
 # salaries by ORR, emails and phone numbers removed
-salary_file <- "../salary_data/Updated 2023-10 All Faculty and Staff Title and Salary Information.xlsx"
+salary_file <- "../salary_data/Updated 2024-04 All Faculty and Staff Title and Salary Information.xlsx"
 # TTC info from https://github.com/vgXhc/TTC
-salary_range_file <- "salary_ranges_sep2022.RDS"
+salary_range_file <- "salary_ranges_jan_2024.csv"
 
 x <- readxl::read_excel(salary_file)
 x <- as.data.frame(x)
@@ -57,8 +57,8 @@ cat(y, file="salaries.json")
 
 ######################################################################
 # salary ranges
-salary_ranges <- readRDS(salary_range_file)
-salary_ranges <- as.data.frame(salary_ranges)
+salary_ranges <- read.csv(salary_range_file)
+salary_ranges$salary_grade <- sprintf("%03d", salary_ranges$salary_grade)
 
 v <- vector("list", nrow(salary_ranges))
 names(v) <- salary_ranges[,1]

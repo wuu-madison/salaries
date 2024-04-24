@@ -1,4 +1,5 @@
 *.xlsx
+*.csv
 *.RDS
 *.Rout
 notes*.txt
