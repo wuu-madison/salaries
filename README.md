@@ -13,6 +13,10 @@ tool](https://haraldkliems.shinyapps.io/My_TTC_salary/).
 
 - <https://wuu-madison.github.io/salaries>
 
+The data are also available on [google
+drive](https://drive.google.com/drive/folders/1kpRy_g0RB04DE2HWsEGa7aareKl6vdIj?usp=drive_link),
+if you just want to download the Excel file.
+
 ---
 
 Code released under the [MIT License](LICENSE).
