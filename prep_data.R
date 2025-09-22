@@ -18,6 +18,10 @@ x <- x[,c("First_Name", "Last_Name", "Division", "Department", "Title", "Salary_
           "Annual_Full_Salary", "Jobcode")]
 colnames(x) <- c("FirstName", "LastName", "Division", "Department", "Title", "SalaryGrade", "AnnualSalary", "JobCode")
 
+# convert names to upper case
+x$FirstName <- toupper(x$FirstName)
+x$LastName <- toupper(x$LastName)
+
 # remove duplicates
 z <- apply(x, 1, paste, collapse="|")
 m <- match(z, z)
