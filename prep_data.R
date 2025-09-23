@@ -4,8 +4,6 @@ library(jsonlite)
 
 # salaries by ORR, emails and phone numbers removed
 salary_file <- "../salary_data/Updated 2025-09 All Faculty and Staff Title and Salary Information.xlsx"
-# TTC info from https://github.com/vgXhc/TTC
-salary_range_file <- "salary_ranges_jan_2024.csv"
 
 x <- readxl::read_excel(salary_file)
 x <- as.data.frame(x)
@@ -62,16 +60,3 @@ x <- x[, colnames(x) != "Title"]
 # convert to JSON
 y <- jsonlite::toJSON(x)
 cat(y, file="salaries.json")
-
-######################################################################
-# salary ranges
-salary_ranges <- read.csv(salary_range_file)
-salary_ranges$salary_grade <- sprintf("%03d", salary_ranges$salary_grade)
-
-v <- vector("list", nrow(salary_ranges))
-names(v) <- salary_ranges[,1]
-for(i in seq_along(v)) {
-    v[[i]] <- list(min=salary_ranges[i,2], max=salary_ranges[i,3])
-}
-
-cat(toJSON(v, auto_unbox=TRUE), file="salary_ranges.json")
