@@ -3,18 +3,26 @@ library(readxl)
 library(jsonlite)
 
 # salaries by ORR, emails and phone numbers removed
-salary_file <- "../salary_data/Updated 2025-09 All Faculty and Staff Title and Salary Information.xlsx"
+salary_file <- "../salary_data/Updated 2026-03 All Faculty and Staff Title and Salary Information.xlsx"
 
 x <- readxl::read_excel(salary_file)
 x <- as.data.frame(x)
 
+# fix column names
+n <- names(x)
+n[n=="Annualized_Rate_Amount"] <- "Annual_Full_Salary"
+n[n=="Job_Code"] <- "Jobcode"
+names(x) <- n
+
 # remove $0 cases and FTE > 0.01
-x <- x[x$"Annual_Full_Salary">1000 & x$"Full_Time_Equivalent" > 0.01,]
+x <- x[x$"Annual_Full_Salary">1000 & x$"FTE" > 0.01,]
+
 
 # reduce columns
 x <- x[,c("First_Name", "Last_Name", "Division", "Department", "Title", "Salary_Grade",
           "Annual_Full_Salary", "Jobcode")]
 colnames(x) <- c("FirstName", "LastName", "Division", "Department", "Title", "SalaryGrade", "AnnualSalary", "JobCode")
+
 
 # convert names to upper case
 x$FirstName <- toupper(x$FirstName)
